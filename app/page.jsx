@@ -1,6 +1,6 @@
 'use client';
 import { SeiWalletProvider } from '@sei-js/react';
-import Home from './Home.jsx';
+import Home from './home.jsx';
 
 function App() {
     return (
