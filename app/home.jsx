@@ -10,6 +10,7 @@ function Home() {
 	const [isIncrementing, setIsIncrementing] = useState(false);
 	const [balance, setBalance] = useState('');
 	const [signedMessage, setSignedMessage]  = useState('')
+	const [verifyMessage, setVerifyMessage] = useState('false')
 	const REST_RPC_URL = "https://rest.atlantic-2.seinetwork.io/"
 	const RPC_URL = "https://rpc.atlantic-2.seinetwork.io/"
 
@@ -45,6 +46,13 @@ function Home() {
 		setSignedMessage(JSON.stringify(res))
 	}
 
+	const verifyArbitraryTest = async () => {
+		var SENDER_ADDRESS = accounts[0].address
+		var res = await connectedWallet.verifyArbitrary("atlantic-2", SENDER_ADDRESS, "hello", signedMessage)
+		console.log("verified ----- is: ", res);
+		setVerifyMessage(String(res))
+	}
+
 	const disableTest = async() => {
 		var SENDER_ADDRESS = accounts[0].address
 		var res = await connectedWallet.disconnect("atlantic-2", SENDER_ADDRESS, "hello")
@@ -75,9 +83,11 @@ function Home() {
         var calculate = calculateFee(res, "0.1usei")
 		try {
 			console.log("send tokens")
-			const sendResponse = await signingClient.sendTokens(SENDER_ADDRESS, DESTINATION_ADDRESS, [amount], { amount: [ { amount: '8411', denom: 'usei' } ], gas: '84103' });
-			console.log(sendResponse.transactionHash);
-			setTxHash(sendResponse.transactionHash)
+			// const sendResponse = await signingClient.sendTokens(SENDER_ADDRESS, DESTINATION_ADDRESS, [amount], { amount: [ { amount: '8411', denom: 'usei' } ], gas: '84103' });
+			// console.log(sendResponse.transactionHash);
+			// setTxHash(sendResponse.transactionHash)
+			var res = await signingClient.sign(SENDER_ADDRESS,[],{ amount: [ { amount: '8411', denom: 'usei' } ], gas: '84103' });
+			console.log(res)
 		} catch(err) {
 			console.log("error", err);
 			setError(err.toString())
@@ -96,12 +106,17 @@ function Home() {
 		<p>balance is {balance}</p>
 		<p>tx hash: ${txHash}</p>
 		<p>signed message: ${signedMessage}</p>
+		<p>verified message: ${verifyMessage}</p>
 		<button onClick={senToken}>
 		    send token
 		</button>
 		<p>--</p>
 		<button onClick={signArbitraryTest}>
 		signArbitraryTest
+		</button>
+		<p>--</p>
+		<button onClick={verifyArbitraryTest}>
+		verifyArbitraryTest
 		</button>
 		<p>--</p>
 		<button onClick={disableTest}>
