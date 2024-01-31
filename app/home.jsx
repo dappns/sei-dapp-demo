@@ -18,8 +18,15 @@ const Home = () => {
 
     // Fetch balance
     const fetchBalance = useCallback(async () => {
-        // ... existing fetchBalance logic
-    }, [accounts]);
+			console.log(accounts);
+			if(accounts.length > 0) {
+				const queryClient = await getQueryClient(REST_RPC_URL);
+				var balanceInfo = await queryClient.cosmos.bank.v1beta1.allBalances({
+					address: accounts[0].address
+				});
+				setBalance(JSON.stringify(balanceInfo.balances))
+			}
+		}, [accounts])
 
     // Fetch NFTs
     const fetchNFTs = useCallback(async () => {
@@ -41,8 +48,9 @@ const Home = () => {
 
     // useEffects
     useEffect(() => {
-        // ... existing useEffect for balance
-    }, [connectedWallet, fetchBalance]);
+			console.log("fetch balance,");
+		    fetchBalance()
+		}, [connectedWallet]);
 
     useEffect(() => {
         if (connectedWallet) {
@@ -50,11 +58,19 @@ const Home = () => {
         }
     }, [connectedWallet, fetchNFTs]);
 
-    // Placeholder function to query NFTs
     const queryNftsForAddress = async (address) => {
-        // Implement actual NFT fetching logic here
-        return []; // Return an array of NFT objects
-    };
+		    // Assuming you have a function to create a CosmWasm client
+		    const client = await createCosmWasmClient();
+		    
+		    // Replace with actual contract query
+		    const nfts = await client.queryContractSmart("sei1cpvpswatmeqw7l3macl5cty645j8caa6znfnltq63yawwhutcntshys0yn", {
+		        owner: address,
+		        // Additional query parameters as needed
+		    });
+
+		    return nfts;
+		};
+
 
     // UI Rendering
     return (
