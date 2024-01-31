@@ -7,9 +7,9 @@ function App() {
     	// Set up SeiWalletProvider for easy wallet connection and to use hooks in @sei-js/react
         <SeiWalletProvider
 	    chainConfiguration={{
-	        chainId: 'atlantic-2',
-          restUrl: 'https://rest.atlantic-2.seinetwork.io',
-          rpcUrl: 'https://rpc.atlantic-2.seinetwork.io'
+	        chainId: 'pacific-1',
+          restUrl: 'https://sei-rpc.polkachu.com',
+          rpcUrl: 'https://sei-rpc.polkachu.com'
 	    }}
 	    wallets={['leap','keplr', 'fin','compass','falcon','coin98']}>
 	        <Home />
