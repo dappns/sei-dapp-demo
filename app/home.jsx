@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useWallet, WalletConnectButton, useCosmWasmClient } from '@sei-js/react';
 
-const CONTRACT_ADDRESS = 'sei1cpvpswatmeqw7l3macl5cty645j8caa6znfnltq63yawwhutcntshys0yn'; // Replace with your NFT contract address
+const CONTRACT_ADDRESS = 'sei1flpm0ptr0td5pddxv0rhw3lauctcmh5v9a20s7dtpy0tmyp3ms3q8zlryu'; // Replace with your NFT contract address
 
 const Home = () => {
     const [nfts, setNfts] = useState([]);
