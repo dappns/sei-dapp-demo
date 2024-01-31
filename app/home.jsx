@@ -1,27 +1,63 @@
-import { useCallback, useEffect, useState } from 'react';
-import { useCosmWasmClient, useSigningCosmWasmClient, useWallet, WalletConnectButton } from '@sei-js/react';
-import { getQueryClient, getSigningClient } from '@sei-js/core';
-const CONTRACT_ADDRESS = 'sei18g4g35mhy5s88nshpa6flvpj9ex6u88l6mhjmzjchnrfa7xr00js0gswru'; // (atlantic-2 example) sei18g4g35mhy5s88nshpa6flvpj9ex6u88l6mhjmzjchnrfa7xr00js0gswru
-import { calculateFee } from '@cosmjs/stargate';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useWallet, WalletConnectButton, useCosmWasmClient } from '@sei-js/react';
 
-import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
+const CONTRACT_ADDRESS = 'sei1cpvpswatmeqw7l3macl5cty645j8caa6znfnltq63yawwhutcntshys0yn'; // Replace with your NFT contract address
 
-const createCosmWasmClient = async () => {
-    const rpcEndpoint = "https://sei-rpc.polkachu.com"; // Replace with your network RPC endpoint
-    const signer = ...; // Define the signer, depending on your authentication method
-    
-    return SigningCosmWasmClient.connectWithSigner(rpcEndpoint, signer);
-};
-
-// Home.tsx
 const Home = () => {
-    // Within any component that is a child of <SeiWalletProvider>
-    const { offlineSigner, connectedWallet, accounts } = useWallet();
+    const [nfts, setNfts] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+
+    const { connectedWallet, accounts } = useWallet();
+    const { cosmWasmClient } = useCosmWasmClient();
+
+    const fetchNFTs = useCallback(async () => {
+        if (accounts.length > 0) {
+            setLoading(true);
+            setError('');
+            try {
+                const address = accounts[0].address;
+                // Construct your query message based on your contract
+                const queryMsg = { /* Your query message here */ };
+                const response = await cosmWasmClient.queryContractSmart(CONTRACT_ADDRESS, queryMsg);
+                setNfts(response.nfts); // Adjust this based on the actual response structure
+            } catch (err) {
+                console.error(err);
+                setError('Failed to fetch NFTs');
+            }
+            setLoading(false);
+        }
+    }, [accounts, cosmWasmClient]);
+
+    useEffect(() => {
+        if (connectedWallet) {
+            fetchNFTs();
+        }
+    }, [connectedWallet, fetchNFTs]);
+
+    if (!connectedWallet) {
+        return <WalletConnectButton />;
+    }
+
     return (
         <div>
-            {!connectedWallet ? <WalletConnectButton /> : <p>connected to: {connectedWallet}</p>}
+            <h1>My NFTs</h1>
+            {loading ? (
+                <p>Loading...</p>
+            ) : error ? (
+                <p>Error: {error}</p>
+            ) : (
+                <ul>
+                    {nfts.map((nft, index) => (
+                        <li key={index}>
+                            <p>NFT Name: {nft.name}</p>
+                            {/* Render more NFT details as needed */}
+                        </li>
+                    ))}
+                </ul>
+            )}
         </div>
-    )
+    );
 };
 
 export default Home;
