@@ -11,7 +11,7 @@ function App() {
           restUrl: 'https://rest.atlantic-2.seinetwork.io',
           rpcUrl: 'https://rpc.atlantic-2.seinetwork.io'
 	    }}
-	    wallets={['keplr', 'fin','compass']}>
+	    wallets={['leap','keplr', 'fin','compass','falcon','coin98']}>
 	        <Home />
       </SeiWalletProvider>
     );
