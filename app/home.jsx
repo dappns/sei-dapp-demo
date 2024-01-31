@@ -7,67 +7,76 @@ import { calculateFee } from '@cosmjs/stargate';
 
 
 const Home = () => {
-    // Existing state variables
+    // State variables
     const [balance, setBalance] = useState('');
     const [error, setError] = useState('');
-    const [nfts, setNfts] = useState([]); // State for NFTs
+    const [nfts, setNfts] = useState([]);
+    const [loadingNFTs, setLoadingNFTs] = useState(false); // State to indicate loading status
 
-    // Existing wallet hooks
+    // Wallet hooks
     const { connectedWallet, accounts } = useWallet();
 
-    // Fetch balance (existing logic)
+    // Fetch balance
     const fetchBalance = useCallback(async () => {
-        // ... your existing fetchBalance logic
+        // ... existing fetchBalance logic
     }, [accounts]);
 
     // Fetch NFTs
     const fetchNFTs = useCallback(async () => {
         if (accounts.length > 0) {
+            setLoadingNFTs(true);
             const walletAddress = accounts[0].address;
-            // Implement the actual NFT fetching logic here
-            const fetchedNfts = await queryNftsForAddress(walletAddress);
-            setNfts(fetchedNfts);
+            console.log(`Fetching NFTs for address: ${walletAddress}`);
+            try {
+                const fetchedNfts = await queryNftsForAddress(walletAddress);
+                console.log('Fetched NFTs:', fetchedNfts);
+                setNfts(fetchedNfts);
+            } catch (err) {
+                console.error('Error fetching NFTs:', err);
+                setError(err.message);
+            }
+            setLoadingNFTs(false);
         }
     }, [accounts]);
 
-    // Existing useEffect for balance
+    // useEffects
     useEffect(() => {
-        if (connectedWallet) {
-            fetchBalance();
-        }
+        // ... existing useEffect for balance
     }, [connectedWallet, fetchBalance]);
 
-    // useEffect for NFTs
     useEffect(() => {
         if (connectedWallet) {
             fetchNFTs();
         }
     }, [connectedWallet, fetchNFTs]);
 
-    // Placeholder function to query NFTs - replace with actual implementation
+    // Placeholder function to query NFTs
     const queryNftsForAddress = async (address) => {
-        // Replace with actual NFT fetching logic
+        // Implement actual NFT fetching logic here
         return []; // Return an array of NFT objects
     };
 
-    // UI rendering
+    // UI Rendering
     return (
         <div>
             {/* Existing UI elements */}
             <h1>Balance: {balance}</h1>
-            <div>
-                <h2>My NFTs:</h2>
+            <h2>My NFTs:</h2>
+            {loadingNFTs ? (
+                <p>Loading NFTs...</p>
+            ) : nfts.length > 0 ? (
                 <ul>
                     {nfts.map((nft, index) => (
                         <li key={index}>
-                            {/* Render your NFT data here */}
                             <p>NFT Name: {nft.name}</p>
-                            {/* Add more NFT details as needed */}
+                            {/* Render more NFT details as needed */}
                         </li>
                     ))}
                 </ul>
-            </div>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
+            ) : (
+                <p>No NFTs found.</p>
+            )}
+            {error && <p style={{ color: 'red' }}>Error: {error}</p>}
             {!connectedWallet && <WalletConnectButton />}
         </div>
     );
